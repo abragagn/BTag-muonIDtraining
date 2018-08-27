@@ -55,13 +55,13 @@ dataBs = TFile.Open('bankBsJpsiPhi17.root')
 dataBsD0 = TFile.Open('bankBsJpsiPhiDGamma017.root')
 dataBu = TFile.Open('bankBuJpsiK17.root')
 dataBd = TFile.Open('bankBdJpsiKx17.root')
-dataBdNS = TFile.Open('bankBdKxMuMu17.root')
+dataBdNR = TFile.Open('bankBdKxMuMu17.root')
 
 treeBs = dataBs.Get('PDsecondTree')
 treeBsD0 = dataBsD0.Get('PDsecondTree')
 treeBu = dataBu.Get('PDsecondTree')
 treeBd = dataBd.Get('PDsecondTree')
-treeBdNS = dataBdNS.Get('PDsecondTree')
+treeBdNR = dataBdNR.Get('PDsecondTree')
 
 dataloader = TMVA.DataLoader('dataset')
 
@@ -115,13 +115,13 @@ dataloader.AddSignalTree(treeBs, 1.0)
 dataloader.AddSignalTree(treeBsD0, 1.0)
 dataloader.AddSignalTree(treeBu, 1.0)
 dataloader.AddSignalTree(treeBd, 1.0)
-dataloader.AddSignalTree(treeBdNS, 1.0)
+dataloader.AddSignalTree(treeBdNR, 1.0)
 
 dataloader.AddBackgroundTree(treeBs, 1.0)
 dataloader.AddBackgroundTree(treeBsD0, 1.0)
 dataloader.AddBackgroundTree(treeBu, 1.0)
 dataloader.AddBackgroundTree(treeBd, 1.0)
-dataloader.AddBackgroundTree(treeBdNS, 1.0)
+dataloader.AddBackgroundTree(treeBdNR, 1.0)
 
 if region == 'Barrel':
 	nBkg = '20000'
