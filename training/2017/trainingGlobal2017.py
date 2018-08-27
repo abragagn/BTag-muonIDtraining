@@ -174,7 +174,7 @@ if kerasFlag:
 	model.summary()
 
 	# Book methods
-	dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=1000:TriesEarlyStopping=50:BatchSize=64'
+	dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=1000:TriesEarlyStopping=50:BatchSize=128'
 
 	dnnOptions += ':VarTransform=N'
 	dnnOptions += ',G(_V0_,_V1_,_V2_,_V3_,_V4_,_V5_,_V6_,_V8_,_V9_,_V10_,_V11_,_V12_,_V13_,_V15_,_V16_,_V17_,_V20_,_V22_'
@@ -190,7 +190,7 @@ if kerasFlag:
 
 	factory.BookMethod(dataloader, TMVA.Types.kPyKeras, dnnName, dnnOptions)
 
-	modelName_PT = 'TrainedModel_DNNGlobal' + region + '2016' + var1 + var2 + '.h5'
+	modelName_PT = 'preTrainedModels/TrainedModel_DNNGlobal' + region + '2016' + var1 + var2 + '.h5'
 	dnnOptions_PT = '!H:!V:FilenameModel=' + modelName_PT + ':NumEpochs=1000:TriesEarlyStopping=50:BatchSize=64'
 	
 	dnnOptions_PT += ':VarTransform=N'

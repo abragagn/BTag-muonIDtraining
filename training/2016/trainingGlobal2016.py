@@ -127,8 +127,8 @@ if region == 'Barrel':
 	nBkg = '280000'
 	nSgn = '140000'
 elif region == 'Endcap':
-	nBkg = '800000'
-	nSgn = '400000'
+	nBkg = '1000000'
+	nSgn = '500000'
 
 dataloaderOpt = 'nTrain_Signal=' + nSgn + ':nTrain_Background=' + nBkg + ':nTest_Signal=' + nSgn + ':nTest_Background=' + nBkg
 dataloaderOpt += ':SplitMode=Random:NormMode=NumEvents:!V'
@@ -174,11 +174,11 @@ if kerasFlag:
 	model.summary()
 
 	# Book methods
-	dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=1000:TriesEarlyStopping=50'
+	dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=1000'
 	if region == 'Barrel': 
-		dnnOptions += ':BatchSize=64'
+		dnnOptions += ':TriesEarlyStopping=50:BatchSize=512'
 	elif region == 'Endcap':
-		dnnOptions += ':BatchSize=512'
+		dnnOptions += ':TriesEarlyStopping=50:BatchSize=512'
 
 	dnnOptions += ':VarTransform=N'
 	dnnOptions += ',G(_V0_,_V1_,_V2_,_V3_,_V4_,_V5_,_V6_,_V8_,_V9_,_V10_,_V11_,_V12_,_V13_,_V15_,_V16_,_V17_,_V20_,_V22_'
