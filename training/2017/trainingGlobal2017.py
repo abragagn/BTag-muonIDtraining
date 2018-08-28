@@ -34,12 +34,12 @@ if region != 'Barrel' and region != 'Endcap':
 	sys.exit()
 
 if var1 != 'wIP' and var1 != 'woIP':
-        print 'Invalid argument var1'
-        sys.exit()
+	print 'Invalid argument var1'
+	sys.exit()
 
 if var2 != 'wIso' and var2 != 'woIso':
-        print 'Invalid argument var2'
-        sys.exit()
+	print 'Invalid argument var2'
+	sys.exit()
 
 
 outputName = 'TMVAGlobal' + region + '2017' + var1 + var2 + '.root'
