@@ -180,7 +180,7 @@ if kerasFlag:
 	preprocessingOptions = ':VarTransform=N'
 	preprocessingOptions += ',G('
 	for var in varList:
-		if var[1] == 'F':
+		if var[0] == 'muoQprod':
 			preprocessingOptions += var[0] + ','
 	preprocessingOptions = preprocessingOptions[:-1]
 	preprocessingOptions +=  '),N'
