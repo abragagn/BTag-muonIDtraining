@@ -9,7 +9,7 @@ while [ "$i" -le "$max" ]; do
   echo $'#!/bin/sh' > script.sh
   echo $'#BSUB -o testBd.log' >> script.sh
   echo $'eval `scram runtime -sh`' >> script.sh
-  echo "pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BdToKstarMuMu_RunIIFall17MiniAODv2_DCAP.list hist$i.root -v outputFile ntu$i.root -v histoMode RECREATE -v use_gen t -v process BdKxMuMu -n $n -s $skip" >> script.sh
+  echo "pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BdToKstarMuMu_2017_DCAP.list hist$i.root -v outputFile ntu$i.root -v histoMode RECREATE -v use_gen t -v process BdKxMuMu -n $n -s $skip" >> script.sh
   echo "" >> script.sh
   bsub < script.sh;
   cd ..;
