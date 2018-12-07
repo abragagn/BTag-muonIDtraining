@@ -1,6 +1,6 @@
 #!/bin/bash
 i=0;
-max=10;
+max=3;
 n=1000000;
 while [ "$i" -le "$max" ]; do
   mkdir "s$i";
@@ -9,7 +9,7 @@ while [ "$i" -le "$max" ]; do
   echo $'#!/bin/sh' > script.sh
   echo $'#BSUB -o testBsD0.log' >> script.sh
   echo $'eval `scram runtime -sh`' >> script.sh
-  echo "pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BsToJpsiPhi_DGamma0_RunIIFall17MiniAODv2_DCAP.list hist$i.root -v outputFile ntu$i.root -v histoMode RECREATE -v use_gen t -v process BsJPsiPhi -n $n -s $skip" >> script.sh
+  echo "pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BsToJpsiPhi_DGamma0_2017_DCAP.list hist$i.root -v outputFile ntu$i.root -v histoMode RECREATE -v use_gen t -v process BsJPsiPhi -n $n -s $skip" >> script.sh
   echo "" >> script.sh
   bsub < script.sh;
   cd ..;
