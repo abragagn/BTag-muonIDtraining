@@ -1,6 +1,6 @@
 #!/bin/bash
 i=0;
-max=1;
+max=10;
 echo $'#!/bin/sh' > park.sh
 echo -n "hadd bankBuJpsiK17.root" >> park.sh
 while [ "$i" -le "$max" ]; do
