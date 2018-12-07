@@ -124,11 +124,11 @@ dataloader.AddBackgroundTree(treeBd, 1.0)
 dataloader.AddBackgroundTree(treeBdNR, 1.0)
 
 if region == 'Barrel':
-	nBkg = '20000'
-	nSgn = '40000'
+	nBkg = '10000'
+	nSgn = '10000'
 elif region == 'Endcap':
-	nBkg = '55000'
-	nSgn = '55000'
+	nBkg = '1000'
+	nSgn = '1000'
 
 dataloaderOpt = 'nTrain_Signal=' + nSgn + ':nTrain_Background=' + nBkg + ':nTest_Signal=' + nSgn + ':nTest_Background=' + nBkg
 dataloaderOpt += ':SplitMode=Random:NormMode=NumEvents:!V'
@@ -189,23 +189,6 @@ if kerasFlag:
 	dnnName = 'DNNGlobal' + region + '2017' + var1 + var2
 
 	factory.BookMethod(dataloader, TMVA.Types.kPyKeras, dnnName, dnnOptions)
-
-	modelName_PT = 'preTrainedModels/TrainedModel_DNNGlobal' + region + '2016' + var1 + var2 + '.h5'
-	dnnOptions_PT = '!H:!V:FilenameModel=' + modelName_PT + ':NumEpochs=1000:TriesEarlyStopping=50:BatchSize=64'
-	
-	dnnOptions_PT += ':VarTransform=N'
-	dnnOptions_PT += ',G(_V0_,_V1_,_V2_,_V3_,_V4_,_V5_,_V6_,_V8_,_V9_,_V10_,_V11_,_V12_,_V13_,_V15_,_V16_,_V17_,_V20_,_V22_'
-	if var1 == 'wIP' and var2 == 'wIso':
-		dnnOptions_PT += ',_V24_,_V25_,_V26_'
-	elif var1 == 'wIP' and var2 == 'woIso':
-		dnnOptions_PT += ',_V24_,_V25_'
-	elif var1 == 'woIP' and var2 == 'wIso':
-		dnnOptions_PT += ',_V24_'
-	dnnOptions_PT += '),N'
-
-	dnnName_PT = 'DNNPTGlobal' + region + '2017' + var1 + var2
-
-	factory.BookMethod(dataloader, TMVA.Types.kPyKeras, dnnName_PT, dnnOptions_PT)
 
 if bdtFlag:
 	bdtOptions = '!H:!V:UseBaggedBoost:BaggedSampleFraction=0.6:NTrees=600:MaxDepth=8:nCuts=100:MinNodeSize=1.0%:BoostType=RealAdaBoost:AdaBoostBeta=0.3:SigToBkgFraction=2:DoBoostMonitor=True'
