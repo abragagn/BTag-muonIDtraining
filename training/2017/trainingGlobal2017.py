@@ -17,6 +17,27 @@ from keras.regularizers import l2
 from keras.optimizers import SGD
 from keras.callbacks import ModelCheckpoint
 
+##### FUNCTIONS
+
+def getKerasModel(inputDim, modelName, layerSize = 100, nLayers = 5, dropValue = 0.5):
+	model = Sequential()
+	model.add(Dense(layerSize, activation='relu', kernel_initializer='normal', input_dim=inputDim))
+	model.add(Dropout(dropValue))
+
+	for i in range(1, nLayers):
+		model.add(Dense(layerSize, activation='relu', kernel_initializer='normal'))
+		model.add(Dropout(dropValue))
+
+	model.add(Dense(2, activation='softmax'))
+
+	sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+	model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+	
+	model.save(modelName)
+	model.summary()
+	return
+
+##### MAIN
 
 # Setup TMVA
 TMVA.Tools.Instance()
@@ -66,36 +87,44 @@ treeBdNR = dataBdNR.Get('PDsecondTree')
 dataloader = TMVA.DataLoader('dataset')
 
 # add variables
-dataloader.AddVariable( 'muoPt', 'F' )
-dataloader.AddVariable( 'abs(muoEta)', 'F' )
-dataloader.AddVariable( 'muoSegmComp', 'F' )
-dataloader.AddVariable( 'muoChi2LM', 'F' )
-dataloader.AddVariable( 'muoChi2LP', 'F' )
-dataloader.AddVariable( 'muoGlbTrackTailProb', 'F' )
-dataloader.AddVariable( 'muoIValFrac', 'F' )
-dataloader.AddVariable( 'muoLWH', 'I' )
-dataloader.AddVariable( 'muoTrkKink', 'F' )
-dataloader.AddVariable( 'muoGlbKinkFinderLOG', 'F' )
-dataloader.AddVariable( 'muoTimeAtIpInOutErr', 'F' )
-dataloader.AddVariable( 'muoOuterChi2', 'F' )
-dataloader.AddVariable( 'muoInnerChi2', 'F' )  
-dataloader.AddVariable( 'muoTrkRelChi2', 'F' )
-dataloader.AddVariable( 'muoVMuonHitComb', 'I' )
-dataloader.AddVariable( 'muoGlbDeltaEtaPhi', 'F' )
-dataloader.AddVariable( 'muoStaRelChi2', 'F' )
-dataloader.AddVariable( 'muoTimeAtIpInOut', 'F' )
-dataloader.AddVariable( 'muoValPixHits', 'I' )
-dataloader.AddVariable( 'muoNTrkVHits', 'I' )
-dataloader.AddVariable( 'muoGNchi2', 'F' )
-dataloader.AddVariable( 'muoVMuHits', 'I' )
-dataloader.AddVariable( 'muoNumMatches', 'F' )
-dataloader.AddVariable( 'muoQprod', 'I' )
-if var1 == 'wIP':
-	dataloader.AddVariable( 'trkDxy/trkExy', 'F' )
-	dataloader.AddVariable( 'trkDz/trkEz', 'F' )
-if var2 == 'wIso':
-	dataloader.AddVariable( 'muoPFiso', 'F' )
+varList = [
+	('muoPt', 'F')
+	,('abs(muoEta)', 'F')
+        ,('muoSegmComp', 'F')
+        ,('muoChi2LM', 'F')
+        ,('muoChi2LP', 'F')
+        ,('muoGlbTrackTailProb', 'F')
+        ,('muoIValFrac', 'F')
+        ,('muoLWH', 'I')
+        ,('muoTrkKink', 'F')
+        ,('muoGlbKinkFinderLOG', 'F')
+        ,('muoTimeAtIpInOutErr', 'F')
+        ,('muoOuterChi2', 'F')
+        ,('muoInnerChi2', 'F')
+        ,('muoTrkRelChi2', 'F')
+        ,('muoVMuonHitComb', 'I')
+        ,('muoGlbDeltaEtaPhi', 'F')
+        ,('muoStaRelChi2', 'F')
+        ,('muoTimeAtIpInOut', 'F')
+        ,('muoValPixHits', 'I')
+        ,('muoNTrkVHits', 'I')
+        ,('muoGNchi2', 'F')
+        ,('muoVMuHits', 'I')
+        ,('muoNumMatches', 'F')
+        ,('muoQprod', 'I')
+	]
 
+
+if var1 == 'wIP':
+	varList.append(('trkDxy/trkExy', 'F'))
+	varList.append(('trkDz/trkEz', 'F'))
+if var2 == 'wIso':
+	varList.append(('muoPFiso', 'F'))
+
+nVars = 0
+for var in varList:
+	dataloader.AddVariable( var[0], var[1] )
+	nVars += 1
 
 dataloader.AddSpectator( 'muoEvt', 'I' )
 
@@ -124,8 +153,8 @@ dataloader.AddBackgroundTree(treeBd, 1.0)
 dataloader.AddBackgroundTree(treeBdNR, 1.0)
 
 if region == 'Barrel':
-	nBkg = '10000'
-	nSgn = '10000'
+	nBkg = '1000'
+	nSgn = '1000'
 elif region == 'Endcap':
 	nBkg = '1000'
 	nSgn = '1000'
@@ -137,58 +166,28 @@ dataloader.PrepareTrainingAndTestTree(TCut(mycuts), TCut(mycutb), dataloaderOpt)
 
 if kerasFlag:
 	# Define model
+	modelName = 'model' + region + '17' + var1 + var2 + '.h5'
 	dropValue = 0.5
 	layerSize = 200
-	inputDim = 24
-	if var1 == 'wIP':
-		inputDim += 2
-	if var2 == 'wIso':
-		inputDim += 1
+	nLayers = 5
 
-	model = Sequential()
-
-	model.add(Dense(layerSize, activation='relu', kernel_initializer='normal', input_dim=inputDim))
-	model.add(Dropout(dropValue))
-
-	model.add(Dense(layerSize, activation='relu', kernel_initializer='normal'))
-	model.add(Dropout(dropValue))
-
-	model.add(Dense(layerSize, activation='relu', kernel_initializer='normal'))
-	model.add(Dropout(dropValue))
-
-	model.add(Dense(layerSize, activation='relu', kernel_initializer='normal'))
-	model.add(Dropout(dropValue))
-
-	model.add(Dense(layerSize, activation='relu', kernel_initializer='normal'))
-	model.add(Dropout(dropValue))
-
-	model.add(Dense(2, activation='softmax'))
-
-	# Set loss and optimizer
-	sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-	model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
-
-	# Store model to file
-	modelName = 'model' + region + '17' + var1 + var2 + '.h5'
-	model.save(modelName)
-	model.summary()
+	getKerasModel(nVars, modelName, layerSize, nLayers, dropValue)
 
 	# Book methods
 	dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=1000:TriesEarlyStopping=50:BatchSize=128'
 
-	dnnOptions += ':VarTransform=N'
-	dnnOptions += ',G(_V0_,_V1_,_V2_,_V3_,_V4_,_V5_,_V6_,_V8_,_V9_,_V10_,_V11_,_V12_,_V13_,_V15_,_V16_,_V17_,_V20_,_V22_'
-	if var1 == 'wIP' and var2 == 'wIso':
-		dnnOptions += ',_V24_,_V25_,_V26_'
-	elif var1 == 'wIP' and var2 == 'woIso':
-		dnnOptions += ',_V24_,_V25_'
-	elif var1 == 'woIP' and var2 == 'wIso':
-		dnnOptions += ',_V24_'
-	dnnOptions += '),N'
+	
+	preprocessingOptions = ':VarTransform=N'
+	preprocessingOptions += ',G('
+	for var in varList:
+		if var[1] == 'F':
+			preprocessingOptions += var[0] + ','
+	preprocessingOptions = preprocessingOptions[:-1]
+	preprocessingOptions +=  '),N'
 
 	dnnName = 'DNNGlobal' + region + '2017' + var1 + var2
 
-	factory.BookMethod(dataloader, TMVA.Types.kPyKeras, dnnName, dnnOptions)
+	factory.BookMethod(dataloader, TMVA.Types.kPyKeras, dnnName, dnnOptions + preprocessingOptions)
 
 if bdtFlag:
 	bdtOptions = '!H:!V:UseBaggedBoost:BaggedSampleFraction=0.6:NTrees=600:MaxDepth=8:nCuts=100:MinNodeSize=1.0%:BoostType=RealAdaBoost:AdaBoostBeta=0.3:SigToBkgFraction=2:DoBoostMonitor=True'
