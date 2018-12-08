@@ -11,4 +11,4 @@ done
 echo " " >> park.sh
 bash park.sh;
 rm park.sh;
-mv ./bankBdJpsiKx17.root /lustre/cmswork/abragagn/BPH/MuonID/CMSSW_10_3_0_pre1/src/2017/
+mv ./bankBdJpsiKx17.root ../
