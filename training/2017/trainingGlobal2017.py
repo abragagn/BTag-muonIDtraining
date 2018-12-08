@@ -47,8 +47,8 @@ region = sys.argv[1]
 var1 = sys.argv[2]
 var2 = sys.argv[3]
 
-kerasFlag = True
-bdtFlag = True
+DNNFLAG = True
+BDTFLAG = True
 
 if region != 'Barrel' and region != 'Endcap':
 	print 'Invalid argument region'
@@ -164,7 +164,7 @@ dataloaderOpt += ':SplitMode=Random:NormMode=NumEvents:!V'
 
 dataloader.PrepareTrainingAndTestTree(TCut(mycuts), TCut(mycutb), dataloaderOpt)
 
-if kerasFlag:
+if DNNFLAG:
 	# Define model
 	modelName = 'model' + region + '17' + var1 + var2 + '.h5'
 	dropValue = 0.5
@@ -189,7 +189,7 @@ if kerasFlag:
 
 	factory.BookMethod(dataloader, TMVA.Types.kPyKeras, dnnName, dnnOptions + preprocessingOptions)
 
-if bdtFlag:
+if BDTFLAG:
 	bdtOptions = '!H:!V:UseBaggedBoost:BaggedSampleFraction=0.6:NTrees=600:MaxDepth=8:nCuts=100:MinNodeSize=1.0%:BoostType=RealAdaBoost:AdaBoostBeta=0.3:SigToBkgFraction=2:DoBoostMonitor=True'
 	bdtName = 'BDTGlobal' + region + '2017' + var1 + var2
 	factory.BookMethod(dataloader, TMVA.Types.kBDT, bdtName, bdtOptions)
