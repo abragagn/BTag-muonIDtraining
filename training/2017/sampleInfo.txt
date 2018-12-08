@@ -1,3 +1,14 @@
           sgn     bkg
 barrel  1561292  99637
 endcap  2673391  223725
+
+
+
+OLD ROC
+DNNGlobalBarrel2017woIPwIso: 0.900
+DNNPTGlobalBarrel2017woIPwIso: 0.900
+BDTGlobalBarrel2017woIPwIso: 0.895
+
+DNNPTGlobalEndcap2017woIPwIso: 0.927
+DNNGlobalEndcap2017woIPwIso: 0.927
+BDTGlobalEndcap2017woIPwIso: 0.924
