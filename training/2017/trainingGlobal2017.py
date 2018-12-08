@@ -49,7 +49,7 @@ var2 = sys.argv[3]
 
 DNNFLAG = True
 BDTFLAG = True
-DEBUG 	= True
+DEBUG 	= False
 
 if region != 'Barrel' and region != 'Endcap':
 	print 'Invalid argument region'
@@ -202,8 +202,6 @@ if DNNFLAG:
 	preprocessingOptions +=  '),N'
 	
 	dnnName = 'DNNMuonID' + region + '2017' + var1 + var2
-
-	print('\n' + dnnOptions + preprocessingOptions  + '\n')
 
 	factory.BookMethod(dataloader, TMVA.Types.kPyKeras, dnnName, dnnOptions + preprocessingOptions)
 
