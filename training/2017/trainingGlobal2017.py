@@ -185,13 +185,13 @@ if DNNFLAG:
 	preprocessingOptions = preprocessingOptions[:-1]
 	preprocessingOptions +=  '),N'
 
-	dnnName = 'DNNGlobal' + region + '2017' + var1 + var2
+	dnnName = 'DNNMuonID' + region + '2017' + var1 + var2
 
 	factory.BookMethod(dataloader, TMVA.Types.kPyKeras, dnnName, dnnOptions + preprocessingOptions)
 
 if BDTFLAG:
 	bdtOptions = '!H:!V:UseBaggedBoost:BaggedSampleFraction=0.6:NTrees=600:MaxDepth=8:nCuts=100:MinNodeSize=1.0%:BoostType=RealAdaBoost:AdaBoostBeta=0.3:SigToBkgFraction=2:DoBoostMonitor=True'
-	bdtName = 'BDTGlobal' + region + '2017' + var1 + var2
+	bdtName = 'BDTMuonID' + region + '2017' + var1 + var2
 	factory.BookMethod(dataloader, TMVA.Types.kBDT, bdtName, bdtOptions)
 
 # Run training, test and evaluation
