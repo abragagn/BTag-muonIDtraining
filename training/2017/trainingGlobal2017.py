@@ -49,7 +49,7 @@ var2 = sys.argv[3]
 
 DNNFLAG = True
 BDTFLAG = True
-DEBUG 	= False
+DEBUG 	= True
 
 if region != 'Barrel' and region != 'Endcap':
 	print 'Invalid argument region'
@@ -162,11 +162,11 @@ else:
 	dataloader.AddBackgroundTree(treeBdNR, 1.0)
 
 if region == 'Barrel':
-	nBkg = '1000'
-	nSgn = '1000'
+	nBkg = '-1'
+	nSgn = '-1'
 elif region == 'Endcap':
-	nBkg = '1000'
-	nSgn = '1000'
+	nBkg = '-1'
+	nSgn = '-1'
 
 dataloaderOpt = 'nTrain_Signal=' + nSgn + ':nTrain_Background=' + nBkg + ':nTest_Signal=' + nSgn + ':nTest_Background=' + nBkg
 dataloaderOpt += ':SplitMode=Random:NormMode=NumEvents:!V'
@@ -177,27 +177,37 @@ if DNNFLAG:
 	# Define model
 	modelName = 'model' + region + '17' + var1 + var2 + '.h5'
 	dropValue = 0.5
-	layerSize = 200
+	layerSize = 100
 	nLayers = 5
+
+	if DEBUG:
+		dropValue = 0.0
+		nLayers = 1
 
 	getKerasModel(nVars, modelName, layerSize, nLayers, dropValue)
 
 	# Book methods
 	dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=1000:TriesEarlyStopping=50:BatchSize=128'
 
-	
+	iVar = 0
 	preprocessingOptions = ':VarTransform=N'
 	preprocessingOptions += ',G('
 	for var in varList:
 		if var[0] == 'muoQprod':
-			preprocessingOptions += var[0] + ','
+			iVar += 1
+			continue
+		preprocessingOptions += '_V' + str(iVar) + '_' + ','
+		iVar += 1
 	preprocessingOptions = preprocessingOptions[:-1]
 	preprocessingOptions +=  '),N'
-
+	
 	dnnName = 'DNNMuonID' + region + '2017' + var1 + var2
+
+	print('\n' + dnnOptions + preprocessingOptions  + '\n')
 
 	factory.BookMethod(dataloader, TMVA.Types.kPyKeras, dnnName, dnnOptions + preprocessingOptions)
 
+	
 if BDTFLAG:
 	bdtOptions = '!H:!V:UseBaggedBoost:BaggedSampleFraction=0.6:NTrees=600:MaxDepth=8:nCuts=100:MinNodeSize=1.0%:BoostType=RealAdaBoost:AdaBoostBeta=0.3:SigToBkgFraction=2:DoBoostMonitor=True'
 	bdtName = 'BDTMuonID' + region + '2017' + var1 + var2
