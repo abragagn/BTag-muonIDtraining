@@ -149,11 +149,11 @@ if DEBUG:
 	dataloader.AddSignalTree(tree, 1.0)
 	dataloader.AddBackgroundTree(tree, 1.0)
 else:
-	dataloader.AddSignalTree(treeBs, 1.0)
-	dataloader.AddSignalTree(treeBsD0, 1.0)
-	dataloader.AddSignalTree(treeBu, 1.0)
-	dataloader.AddSignalTree(treeBd, 1.0)
-	dataloader.AddSignalTree(treeBdNR, 1.0)
+	dataloader.AddSignalTree(treeBs, 0.2)
+	dataloader.AddSignalTree(treeBsD0, 0.2)
+	dataloader.AddSignalTree(treeBu, 0.2)
+	dataloader.AddSignalTree(treeBd, 0.2)
+	dataloader.AddSignalTree(treeBdNR, 0.2)
 
 	dataloader.AddBackgroundTree(treeBs, 1.0)
 	dataloader.AddBackgroundTree(treeBsD0, 1.0)
@@ -162,11 +162,11 @@ else:
 	dataloader.AddBackgroundTree(treeBdNR, 1.0)
 
 if region == 'Barrel':
-	nBkg = '-1'
-	nSgn = '-1'
+	nBkg = '49800'
+	nSgn = '500000'
 elif region == 'Endcap':
-	nBkg = '-1'
-	nSgn = '-1'
+	nBkg = '111750'
+	nSgn = '1120000'
 
 dataloaderOpt = 'nTrain_Signal=' + nSgn + ':nTrain_Background=' + nBkg + ':nTest_Signal=' + nSgn + ':nTest_Background=' + nBkg
 dataloaderOpt += ':SplitMode=Random:NormMode=NumEvents:!V'
