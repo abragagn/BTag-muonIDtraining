@@ -49,6 +49,7 @@ var2 = sys.argv[3]
 
 DNNFLAG = True
 BDTFLAG = True
+DEBUG 	= False
 
 if region != 'Barrel' and region != 'Endcap':
 	print 'Invalid argument region'
@@ -72,17 +73,21 @@ factory = TMVA.Factory('TMVAClassification', output,
                        '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
 
 # Load data
-dataBs = TFile.Open('bankBsJpsiPhi17.root')
-dataBsD0 = TFile.Open('bankBsJpsiPhiDGamma017.root')
-dataBu = TFile.Open('bankBuJpsiK17.root')
-dataBd = TFile.Open('bankBdJpsiKx17.root')
-dataBdNR = TFile.Open('bankBdKxMuMu17.root')
+if DEBUG:
+	data = TFile.Open('bankBsJpsiPhiDGamma017.root')
+	tree = data.Get('PDsecondTree')
+else:
+	dataBs = TFile.Open('bankBsJpsiPhi17.root')
+	dataBsD0 = TFile.Open('bankBsJpsiPhiDGamma017.root')
+	dataBu = TFile.Open('bankBuJpsiK17.root')
+	dataBd = TFile.Open('bankBdJpsiKx17.root')
+	dataBdNR = TFile.Open('bankBdKxMuMu17.root')
 
-treeBs = dataBs.Get('PDsecondTree')
-treeBsD0 = dataBsD0.Get('PDsecondTree')
-treeBu = dataBu.Get('PDsecondTree')
-treeBd = dataBd.Get('PDsecondTree')
-treeBdNR = dataBdNR.Get('PDsecondTree')
+	treeBs = dataBs.Get('PDsecondTree')
+	treeBsD0 = dataBsD0.Get('PDsecondTree')
+	treeBu = dataBu.Get('PDsecondTree')
+	treeBd = dataBd.Get('PDsecondTree')
+	treeBdNR = dataBdNR.Get('PDsecondTree')
 
 dataloader = TMVA.DataLoader('dataset')
 
@@ -140,17 +145,21 @@ elif region == 'Endcap':
 mycuts = mycutgen + '&&abs(muoLund)==13&&muoAncestor>=0'
 mycutb = mycutgen + '&&abs(muoLund)!=13'
 
-dataloader.AddSignalTree(treeBs, 1.0)
-dataloader.AddSignalTree(treeBsD0, 1.0)
-dataloader.AddSignalTree(treeBu, 1.0)
-dataloader.AddSignalTree(treeBd, 1.0)
-dataloader.AddSignalTree(treeBdNR, 1.0)
+if DEBUG:
+	dataloader.AddSignalTree(tree, 1.0)
+	dataloader.AddBackgroundTree(tree, 1.0)
+else:
+	dataloader.AddSignalTree(treeBs, 1.0)
+	dataloader.AddSignalTree(treeBsD0, 1.0)
+	dataloader.AddSignalTree(treeBu, 1.0)
+	dataloader.AddSignalTree(treeBd, 1.0)
+	dataloader.AddSignalTree(treeBdNR, 1.0)
 
-dataloader.AddBackgroundTree(treeBs, 1.0)
-dataloader.AddBackgroundTree(treeBsD0, 1.0)
-dataloader.AddBackgroundTree(treeBu, 1.0)
-dataloader.AddBackgroundTree(treeBd, 1.0)
-dataloader.AddBackgroundTree(treeBdNR, 1.0)
+	dataloader.AddBackgroundTree(treeBs, 1.0)
+	dataloader.AddBackgroundTree(treeBsD0, 1.0)
+	dataloader.AddBackgroundTree(treeBu, 1.0)
+	dataloader.AddBackgroundTree(treeBd, 1.0)
+	dataloader.AddBackgroundTree(treeBdNR, 1.0)
 
 if region == 'Barrel':
 	nBkg = '1000'
