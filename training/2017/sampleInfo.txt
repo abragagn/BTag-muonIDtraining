@@ -5,10 +5,10 @@ endcap  2673391  223725
 
 
           OLD ROC                                           NEW ROC
-DNNGlobalBarrel2017woIPwIso: 0.900            DNNMuonIDEndcap2017woIPwIso       0.937
-DNNPTGlobalBarrel2017woIPwIso: 0.900          BDTMuonIDEndcap2017woIPwIso       0.936
+DNNGlobalBarrel2017woIPwIso: 0.900            DNNMuonIDBarrel2017woIPwIso       0.913
+DNNPTGlobalBarrel2017woIPwIso: 0.900          BDTMuonIDBarrel2017woIPwIso       0.912
 BDTGlobalBarrel2017woIPwIso: 0.895
 
-DNNPTGlobalEndcap2017woIPwIso: 0.927          DNNMuonIDBarrel2017woIPwIso       0.913
-DNNGlobalEndcap2017woIPwIso: 0.927            BDTMuonIDBarrel2017woIPwIso       0.912
+DNNPTGlobalEndcap2017woIPwIso: 0.927          DNNMuonIDEndcap2017woIPwIso       0.937
+DNNGlobalEndcap2017woIPwIso: 0.927            BDTMuonIDEndcap2017woIPwIso       0.936
 BDTGlobalEndcap2017woIPwIso: 0.924
