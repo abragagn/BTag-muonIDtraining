@@ -151,8 +151,8 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
             if(abs(genId->at(aDjpsi[1]))!=13) continue;
             if(abs(genEta->at(aDjpsi[0]))>2.4) continue;
             if(abs(genEta->at(aDjpsi[1]))>2.4) continue;
-            if(genPt->at(aDjpsi[0])<3.5) continue;
-            if(genPt->at(aDjpsi[1])<3.5) continue;
+            //if(genPt->at(aDjpsi[0])<3.5) continue;
+            //if(genPt->at(aDjpsi[1])<3.5) continue;
             if(abs(genEta->at(bCand))>2.5) continue;
 
             signalB = bCand;
@@ -300,6 +300,7 @@ void PDAnalyzer::endJob() {
 
     tWriter->close();
     cout<<"nB "<<nB<<endl<<"nReal "<<nReal<<endl<<"nFake "<<nFake<<endl<<100.0*nReal/nB<<endl;
+    for(int i=0;i<10;++i) cout<<"["<<i<<"]  "<<counter[i]<<endl;
     return;
 }
 
