@@ -141,7 +141,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
         return false;
     }
 
-    if(process=="BsJPsiPhi")    signalLund = 531;
+    if(process=="BsJPsiPhi") signalLund = 531;
     if(process=="BuJPsiK")  signalLund = 521;
     if(process=="BdJPsiKx") signalLund = 511;
     if(process=="BdKxMuMu") signalLund = 511;
@@ -243,7 +243,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
         if(itkmu < 0) continue;
         
         if( !(( trkQuality->at( itkmu ) >> 2 ) & 1) ) continue; 
-        if(!MuonPassedPreselection(iMuon)) continue;
+        if(!muonPassedPreselection(iMuon)) continue;
 
 
         ++nMuSelected;
