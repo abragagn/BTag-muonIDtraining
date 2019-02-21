@@ -64,13 +64,6 @@ void PDAnalyzer::beginJob() {
 
     getUserParameter( "ptCut", ptCut ); //needed for paolo's code for unknow reasons
 
-// to skim the N-tuple "uncomment" the following lines
-// // dropBranch( "*tau*" ); // drop some branch if required
-// initWSkim( new TFile( "skim.root", "RECREATE" ) );
-
-
-// additional features
-// DataSetFilter::beginJob();
     tWriter = new PDSecondNtupleWriter;
     tWriter->open( getUserParameter("outputFile"), "RECREATE" ); // second ntuple
 
@@ -131,10 +124,9 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
     convSpheCart(muoPt, muoEta, muoPhi, muoPx, muoPy, muoPz);
     convSpheCart(trkPt, trkEta, trkPhi, trkPx, trkPy, trkPz);
 
-    // signal muon list
+    //SEARCHING SIGNAL
     int signalLund = 0, signalJpsi = -1, signalB = -1;
     vector <int> signalMuon;
-    vector <int> signalTracks;
 
     if( !((process=="BsJPsiPhi")||(process=="BuJPsiK")||(process=="BdJPsiKx")||(process=="BdKxMuMu")) ) {
         cout<<"!$!#$@$% PROCESS NAME WRONG"<<endl;
@@ -142,54 +134,42 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
     }
 
     if(process=="BsJPsiPhi") signalLund = 531;
-    if(process=="BuJPsiK")  signalLund = 521;
-    if(process=="BdJPsiKx") signalLund = 511;
-    if(process=="BdKxMuMu") signalLund = 511;
+    if(process=="BuJPsiK")   signalLund = 521;
+    if(process=="BdJPsiKx")  signalLund = 511;
+    if(process=="BdKxMuMu")  signalLund = 511;
 
     if((process=="BsJPsiPhi")||(process=="BuJPsiK")||(process=="BdJPsiKx")){
-        for( unsigned int i=0; i<genId->size(); ++i ){
+        for( uint i=0; i<genId->size(); ++i ){
             if( abs(genId->at(i)) != signalLund ) continue;
             int bCand = i;
-
             if(TagMixStatus(bCand)==2) bCand = allDaughters(bCand)[0];
 
             const vector <int>& aD = allDaughters(bCand);
-
             if(genId->at(aD[0])!=443) continue;
-
             const vector <int>& aDjpsi = allDaughters(aD[0]);
-
             if(abs(genId->at(aDjpsi[0]))!=13) continue;
             if(abs(genId->at(aDjpsi[1]))!=13) continue;
-
             if(abs(genEta->at(aDjpsi[0]))>2.4) continue;
             if(abs(genEta->at(aDjpsi[1]))>2.4) continue;
-
-            if(genPt->at(aDjpsi[0])<4) continue;
-            if(genPt->at(aDjpsi[1])<4) continue;
-
+            if(genPt->at(aDjpsi[0])<3.5) continue;
+            if(genPt->at(aDjpsi[1])<3.5) continue;
             if(abs(genEta->at(bCand))>2.5) continue;
 
             signalB = bCand;
             signalJpsi = aD[0];
         }
-
         if(signalJpsi < 0) return false;
 
         const vector <int>& aDjpsi = allDaughters(signalJpsi);
-
         signalMuon.push_back(aDjpsi[0]);
         signalMuon.push_back(aDjpsi[1]);
-        
     }
 
     if(process == "BdKxMuMu"){
         for( unsigned int i=0; i<genId->size(); ++i ){
             if( abs(genId->at(i)) != signalLund ) continue;
             int bCand = i;
-
             if(TagMixStatus(bCand)==2) bCand = allDaughters(bCand)[0];
-
             if(abs(genEta->at(bCand))>2.5) continue;
 
             const vector <int>& aD = allDaughters(bCand);
@@ -203,33 +183,45 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
             for(unsigned int j=0; j<aD.size(); ++j ){
                 if(abs(genId->at(aD[j]))==13) signalMuon.push_back(aD[j]);
             }
-
             signalB = bCand; 
         }   
-
         if(signalB<0) return false;
     }
 
-    const vector <int>& aDsSB = allDaughters(signalB);
-    for(unsigned int j =0; j<aDsSB.size(); ++j) signalTracks.push_back(aDsSB[j]);
+    const vector <int>& aDssb = allDaughters(signalB);
 
     ++nB;
 
  // generation information
     vector <int> ListB;
-    for( unsigned int igen=0; igen<genId->size(); igen++ ){
-        if( IsB(igen) ) ListB.push_back(igen);
-    }
+    for( uint i=0; i<genId->size(); ++i )
+        if( IsB(i) ) 
+            ListB.push_back(i);
 
     int nMuSelected = 0;
 
-
     for ( int iMuon = 0; iMuon < nMuons; ++iMuon ){
+
+        //EXCLUDING SIGNAL
+        bool skip = false;
+        for(auto it:aDssb){
+            if( AreOverlapped(muoPt->at(iMuon),muoEta->at(iMuon),muoPhi->at(iMuon),genPt->at(it),genEta->at(it),genPhi->at(it)) ){
+                skip = true;
+                break;
+            }
+        }
+        if(skip) continue;
+
+        //GLOBAL REQUIREMENT
+        if( !(muoType->at(iMuon) & PDEnumString::global) ) continue;
+        int itkmu = muonTrack( iMuon, PDEnumString::muInner );
+        if(itkmu < 0) continue;
 
         //GEN INFO
         int genMuIndex = GetClosestGen( muoEta->at(iMuon), muoPhi->at(iMuon), muoPt->at(iMuon) );
         if( genMuIndex < 0 ) continue;
-        if(std::find(signalMuon.begin(), signalMuon.end(), genMuIndex) != signalMuon.end()) continue; 
+        if(std::find(signalMuon.begin(), signalMuon.end(), genMuIndex) != signalMuon.end()) continue;  //should not be necessary but
+
         int muoLund = genId->at(genMuIndex);
         int muoAncestor = GetAncestor( genMuIndex, &ListB );
 
@@ -238,13 +230,8 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
         if(abs(muoEta->at( iMuon ))>maxEtaMuon) continue;
 
         //QUALITY
-        if( !(muoType->at(iMuon) & PDEnumString::global) ) continue;
-        int itkmu = muonTrack( iMuon, PDEnumString::muInner );
-        if(itkmu < 0) continue;
-        
         if( !(( trkQuality->at( itkmu ) >> 2 ) & 1) ) continue; 
         if(!muonPassedPreselection(iMuon)) continue;
-
 
         ++nMuSelected;
         if((abs(muoLund) == 13) && (muoAncestor > 0)) ++nReal;
@@ -310,11 +297,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 
 
 void PDAnalyzer::endJob() {
-// to skim the N-tuple "uncomment" the following line
-//  closeSkim();
 
-// additional features
-//  DataSetFilter::endJob();
     tWriter->close();
     cout<<"nB "<<nB<<endl<<"nReal "<<nReal<<endl<<"nFake "<<nFake<<endl<<100.0*nReal/nB<<endl;
     return;
@@ -332,21 +315,3 @@ void PDAnalyzer::save() {
 
     return;
 }
-
-
-// to plot some histogram immediately after the ntuple loop
-// "uncomment" the following lines
-/*
-void PDAnalyzer::plot() {
-    TCanvas* can = new TCanvas( "muoPt", "muoPt", 800, 600 );
-    can->cd();
-    can->Divide( 1, 2 );
-    can->cd( 1 );
-    hptmumax->Draw();
-    hptmu2nd->Draw();
-    return;
-}
-*/
-
-
-// ======MY FUNCTIONS===============================================================================
