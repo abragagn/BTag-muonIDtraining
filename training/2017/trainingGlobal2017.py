@@ -14,12 +14,12 @@ import h5py
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Flatten, Dropout
 from keras.regularizers import l2
-from keras.optimizers import SGD
+from keras.optimizers import SGD, Adam
 from keras.callbacks import ModelCheckpoint
 
 ##### FUNCTIONS
 
-def getKerasModel(inputDim, modelName, layerSize = 100, nLayers = 5, dropValue = 0.5):
+def getKerasModel(inputDim, modelName, layerSize = 100, nLayers = 5, dropValue = 0.5, optLabel = 'sgd'):
     model = Sequential()
     model.add(Dense(layerSize, activation='relu', kernel_initializer='normal', input_dim=inputDim))
     model.add(Dropout(dropValue))
@@ -30,14 +30,23 @@ def getKerasModel(inputDim, modelName, layerSize = 100, nLayers = 5, dropValue =
 
     model.add(Dense(2, activation='softmax'))
 
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+    if optLabel == 'adam':
+        opt = Adam(lr=0.001)
+    else:
+        opt = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
+    model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
     
     model.save(modelName)
     model.summary()
     return
 
 ##### MAIN
+
+# Development Flags
+DNNFLAG = True
+BDTFLAG = True
+TESTMODE = False
 
 # Setup TMVA
 TMVA.Tools.Instance()
@@ -48,9 +57,11 @@ region = sys.argv[1]
 var1 = sys.argv[2]
 var2 = sys.argv[3]
 
-DNNFLAG = True
-BDTFLAG = True
-DEBUG   = False
+if TESTMODE:
+    dropValue = sys.argv[4]
+    layerSize = sys.argv[5]
+    nLayers = sys.argv[6]
+    optLabel = sys.argv[7]
 
 if region != 'Barrel' and region != 'Endcap' region != 'Full':
     print 'Invalid argument region'
@@ -72,17 +83,21 @@ factory = TMVA.Factory('TMVAClassification', output,
                        '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
 
 # Load data
-dataBs = TFile.Open('bankBsJpsiPhi17.root')
-dataBsD0 = TFile.Open('bankBsJpsiPhiDGamma017.root')
-dataBu = TFile.Open('bankBuJpsiK17.root')
-dataBd = TFile.Open('bankBdJpsiKx17.root')
-dataBdNR = TFile.Open('bankBdKxMuMu17.root')
+if TESTMODE:
+    data = TFile.Open('bankBsJpsiPhi17.root')
+    tree = dataBs.Get('PDsecondTree')
+else:
+    dataBs = TFile.Open('bankBsJpsiPhi17.root')
+    dataBsD0 = TFile.Open('bankBsJpsiPhiDGamma017.root')
+    dataBu = TFile.Open('bankBuJpsiK17.root')
+    dataBd = TFile.Open('bankBdJpsiKx17.root')
+    dataBdNR = TFile.Open('bankBdKxMuMu17.root')
 
-treeBs = dataBs.Get('PDsecondTree')
-treeBsD0 = dataBsD0.Get('PDsecondTree')
-treeBu = dataBu.Get('PDsecondTree')
-treeBd = dataBd.Get('PDsecondTree')
-treeBdNR = dataBdNR.Get('PDsecondTree')
+    treeBs = dataBs.Get('PDsecondTree')
+    treeBsD0 = dataBsD0.Get('PDsecondTree')
+    treeBu = dataBu.Get('PDsecondTree')
+    treeBd = dataBd.Get('PDsecondTree')
+    treeBdNR = dataBdNR.Get('PDsecondTree')
 
 dataloader = TMVA.DataLoader('dataset')
 
@@ -141,7 +156,7 @@ elif region == 'Endcap':
 mycuts = mycutgen + '&&abs(muoLund)==13&&muoAncestor>=0'
 mycutb = mycutgen + '&&abs(muoLund)!=13'
 
-if DEBUG:
+if TESTMODE:
     dataloader.AddSignalTree(tree, 1.0)
     dataloader.AddBackgroundTree(tree, 1.0)
 else:
@@ -167,6 +182,10 @@ elif region == 'Full':
     nBkg = '161550'
     nSgn = '1620000'
 
+if TESTMODE:
+    nBkg = '1000'
+    nSgn = '1000'
+
 dataloaderOpt = 'nTrain_Signal=' + nSgn + ':nTrain_Background=' + nBkg + ':nTest_Signal=' + nSgn + ':nTest_Background=' + nBkg
 dataloaderOpt += ':SplitMode=Random:NormMode=NumEvents:!V'
 
@@ -175,11 +194,14 @@ dataloader.PrepareTrainingAndTestTree(TCut(mycuts), TCut(mycutb), dataloaderOpt)
 if DNNFLAG:
     # Define model
     modelName = 'model' + region + '17' + var1 + var2 + '.h5'
-    dropValue = 0.5
-    layerSize = 100
-    nLayers = 5
 
-    getKerasModel(nVars, modelName, layerSize, nLayers, dropValue)
+    if not TESTMODE:
+        dropValue = 0.5
+        layerSize = 100
+        nLayers = 5
+        optLabel = 'sgd'
+
+    getKerasModel(nVars, modelName, layerSize, nLayers, dropValue, optLabel)
 
     # Book methods
     dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=100:TriesEarlyStopping=20:BatchSize=128'
