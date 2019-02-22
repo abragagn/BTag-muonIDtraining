@@ -46,7 +46,7 @@ def getKerasModel(inputDim, modelName, layerSize = 100, nLayers = 5, dropValue =
 # Development Flags
 DNNFLAG = True
 BDTFLAG = True
-TESTMODE = False
+TESTMODE = True
 
 # Setup TMVA
 TMVA.Tools.Instance()
@@ -62,8 +62,11 @@ if TESTMODE:
     layerSize = sys.argv[5]
     nLayers = sys.argv[6]
     optLabel = sys.argv[7]
+    dropValue = float(dropValue)
+    layerSize = int(layerSize)
+    nLayers = int(nLayers)
 
-if region != 'Barrel' and region != 'Endcap' region != 'Full':
+if region != 'Barrel' and region != 'Endcap' and region != 'Full':
     print 'Invalid argument region'
     sys.exit()
 
@@ -75,6 +78,9 @@ if var2 != 'wIso' and var2 != 'woIso':
     print 'Invalid argument var2'
     sys.exit()
 
+if TESTMODE:
+    region += 'Test'
+
 outputName = 'TMVAMuonID' + region + '2017' + var1 + var2 + '.root'
 output = TFile.Open(outputName, 'RECREATE')
 
@@ -85,7 +91,7 @@ factory = TMVA.Factory('TMVAClassification', output,
 # Load data
 if TESTMODE:
     data = TFile.Open('bankBsJpsiPhi17.root')
-    tree = dataBs.Get('PDsecondTree')
+    tree = data.Get('PDsecondTree')
 else:
     dataBs = TFile.Open('bankBsJpsiPhi17.root')
     dataBsD0 = TFile.Open('bankBsJpsiPhiDGamma017.root')
@@ -204,7 +210,7 @@ if DNNFLAG:
     getKerasModel(nVars, modelName, layerSize, nLayers, dropValue, optLabel)
 
     # Book methods
-    dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=100:TriesEarlyStopping=20:BatchSize=128'
+    dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=20:TriesEarlyStopping=5:BatchSize=128'
 
     iVar = 0
     preprocessingOptions = ':VarTransform=N'
