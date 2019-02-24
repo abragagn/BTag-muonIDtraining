@@ -19,7 +19,7 @@ from keras.callbacks import ModelCheckpoint
 
 ##### FUNCTIONS
 
-def getKerasModel(inputDim, modelName, layerSize = 100, nLayers = 5, dropValue = 0.5, optLabel = 'sgd'):
+def getKerasModel(inputDim, modelName, layerSize = 200, nLayers = 2, dropValue = 0.2, optLabel = 'adam'):
     model = Sequential()
     model.add(Dense(layerSize, activation='relu', kernel_initializer='normal', input_dim=inputDim))
     model.add(Dropout(dropValue))
@@ -30,13 +30,11 @@ def getKerasModel(inputDim, modelName, layerSize = 100, nLayers = 5, dropValue =
 
     model.add(Dense(2, activation='softmax'))
 
-    if optLabel == 'adam':
-        opt = Adam(lr=0.001)
-    else:
+    opt = Adam(lr=0.001)
+    if optLabel == 'sgd':
         opt = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
     model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-    
     model.save(modelName)
     model.summary()
     return
@@ -46,16 +44,20 @@ def getKerasModel(inputDim, modelName, layerSize = 100, nLayers = 5, dropValue =
 # Development Flags
 DNNFLAG = True
 BDTFLAG = True
-TESTMODE = True
+TESTMODE = False
 
 # Setup TMVA
 TMVA.Tools.Instance()
 TMVA.PyMethodBase.PyInitialize()
 
 # Parameters
-region = sys.argv[1]
-var1 = sys.argv[2]
-var2 = sys.argv[3]
+#region = sys.argv[1]
+#var1 = sys.argv[2]
+#var2 = sys.argv[3]
+
+region = 'Full'
+var1 = 'woIP'
+var2 = 'wIso'
 
 if TESTMODE:
     dropValue = sys.argv[4]
@@ -185,12 +187,12 @@ elif region == 'Endcap':
     nBkg = '111750'
     nSgn = '1120000'
 elif region == 'Full':
-    nBkg = '161550'
-    nSgn = '1620000'
+    nBkg = '180000'
+    nSgn = '360000'
 
 if TESTMODE:
-    nBkg = '1000'
-    nSgn = '1000'
+    nBkg = '50000'
+    nSgn = '100000'
 
 dataloaderOpt = 'nTrain_Signal=' + nSgn + ':nTrain_Background=' + nBkg + ':nTest_Signal=' + nSgn + ':nTest_Background=' + nBkg
 dataloaderOpt += ':SplitMode=Random:NormMode=NumEvents:!V'
@@ -202,15 +204,15 @@ if DNNFLAG:
     modelName = 'model' + region + '17' + var1 + var2 + '.h5'
 
     if not TESTMODE:
-        dropValue = 0.5
-        layerSize = 100
-        nLayers = 5
-        optLabel = 'sgd'
+        dropValue = 0.2
+        layerSize = 200
+        nLayers = 2
+        optLabel = 'adam'
 
     getKerasModel(nVars, modelName, layerSize, nLayers, dropValue, optLabel)
 
     # Book methods
-    dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=20:TriesEarlyStopping=5:BatchSize=128'
+    dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=100:TriesEarlyStopping=20:BatchSize=512'
 
     iVar = 0
     preprocessingOptions = ':VarTransform=N'
