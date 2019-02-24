@@ -183,18 +183,26 @@ else:
 if region == 'Barrel':
     nBkg = '49800'
     nSgn = '500000'
+    nBkgTest = '49800'
+    nSgnTest = '500000'
 elif region == 'Endcap':
     nBkg = '111750'
     nSgn = '1120000'
+    nBkgTest = '111750'
+    nSgnTest = '1120000'
 elif region == 'Full':
-    nBkg = '180000'
-    nSgn = '360000'
+    nBkg = '448500'
+    nSgn = '897000'
+    nBkgTest = '149500'
+    nSgnTest = '299000'
 
 if TESTMODE:
     nBkg = '50000'
     nSgn = '100000'
+    nBkgTest = '50000'
+    nSgnTest = '100000'
 
-dataloaderOpt = 'nTrain_Signal=' + nSgn + ':nTrain_Background=' + nBkg + ':nTest_Signal=' + nSgn + ':nTest_Background=' + nBkg
+dataloaderOpt = 'nTrain_Signal=' + nSgn + ':nTrain_Background=' + nBkg + ':nTest_Signal=' + nSgnTest + ':nTest_Background=' + nBkgTest
 dataloaderOpt += ':SplitMode=Random:NormMode=NumEvents:!V'
 
 dataloader.PrepareTrainingAndTestTree(TCut(mycuts), TCut(mycutb), dataloaderOpt)
