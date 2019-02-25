@@ -43,7 +43,7 @@ def getKerasModel(inputDim, modelName, layerSize = 200, nLayers = 2, dropValue =
 
 # Development Flags
 DNNFLAG = True
-BDTFLAG = True
+BDTFLAG = False
 TESTMODE = False
 
 # Setup TMVA
@@ -105,7 +105,6 @@ else:
     treeBsD0 = dataBsD0.Get('PDsecondTree')
     treeBu = dataBu.Get('PDsecondTree')
     treeBd = dataBd.Get('PDsecondTree')
-    treeBdNR = dataBdNR.Get('PDsecondTree')
 
 dataloader = TMVA.DataLoader('dataset')
 
@@ -168,17 +167,15 @@ if TESTMODE:
     dataloader.AddSignalTree(tree, 1.0)
     dataloader.AddBackgroundTree(tree, 1.0)
 else:
-    dataloader.AddSignalTree(treeBs, 0.2)
-    dataloader.AddSignalTree(treeBsD0, 0.2)
-    dataloader.AddSignalTree(treeBu, 0.2)
-    dataloader.AddSignalTree(treeBd, 0.2)
-    dataloader.AddSignalTree(treeBdNR, 0.2)
+    dataloader.AddSignalTree(treeBs, 1.0)
+    dataloader.AddSignalTree(treeBsD0, 1.0)
+    dataloader.AddSignalTree(treeBu, 1.0)
+    dataloader.AddSignalTree(treeBd, 1.0)
 
     dataloader.AddBackgroundTree(treeBs, 1.0)
     dataloader.AddBackgroundTree(treeBsD0, 1.0)
     dataloader.AddBackgroundTree(treeBu, 1.0)
     dataloader.AddBackgroundTree(treeBd, 1.0)
-    dataloader.AddBackgroundTree(treeBdNR, 1.0)
 
 if region == 'Barrel':
     nBkg = '49800'
@@ -191,10 +188,15 @@ elif region == 'Endcap':
     nBkgTest = '111750'
     nSgnTest = '1120000'
 elif region == 'Full':
-    nBkg = '448500'
-    nSgn = '897000'
-    nBkgTest = '149500'
-    nSgnTest = '299000'
+    nBkg = '345000'
+    nSgn = '690000'
+    nBkgTest = '115000'
+    nSgnTest = '230000'
+
+nBkg = '350000'
+nSgn = '3000000'
+nBkgTest = '0'
+nSgnTest = '0'
 
 if TESTMODE:
     nBkg = '50000'
@@ -203,7 +205,7 @@ if TESTMODE:
     nSgnTest = '100000'
 
 dataloaderOpt = 'nTrain_Signal=' + nSgn + ':nTrain_Background=' + nBkg + ':nTest_Signal=' + nSgnTest + ':nTest_Background=' + nBkgTest
-dataloaderOpt += ':SplitMode=Random:NormMode=NumEvents:!V'
+dataloaderOpt += ':SplitMode=Random:NormMode=EqualNumEvents:!V'
 
 dataloader.PrepareTrainingAndTestTree(TCut(mycuts), TCut(mycutb), dataloaderOpt)
 
@@ -220,7 +222,7 @@ if DNNFLAG:
     getKerasModel(nVars, modelName, layerSize, nLayers, dropValue, optLabel)
 
     # Book methods
-    dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=100:TriesEarlyStopping=20:BatchSize=512'
+    dnnOptions = '!H:!V:FilenameModel=' + modelName + ':NumEpochs=200:TriesEarlyStopping=20:BatchSize=512:ValidationSize=30%:Tensorboard=./logs'
 
     iVar = 0
     preprocessingOptions = ':VarTransform=N'
