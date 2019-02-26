@@ -4,11 +4,11 @@
     <Info name="TMVA Release" value="4.2.1 [262657]"/>
     <Info name="ROOT Release" value="6.17/01 [397569]"/>
     <Info name="Creator" value="alberto"/>
-    <Info name="Date" value="Mon Feb 25 12:35:21 2019"/>
+    <Info name="Date" value="Mon Feb 25 19:07:04 2019"/>
     <Info name="Host" value="Linux XPS-15-9570 4.15.0-42-generic #45-Ubuntu SMP Thu Nov 15 19:32:57 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux"/>
     <Info name="Dir" value="/home/alberto/Desktop/tmvaTest"/>
     <Info name="Training events" value="3350000"/>
-    <Info name="TrainingTime" value="9.62856927e+02"/>
+    <Info name="TrainingTime" value="1.05315377e+03"/>
     <Info name="AnalysisType" value="Classification"/>
   </GeneralInfo>
   <Options>
